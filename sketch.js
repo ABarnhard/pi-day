@@ -2,11 +2,12 @@ var numberOfElements,
     diameter = 100,
     center,
     fc,
-    rotate,
+    rot,
     a,
     b,
     c,
-    elements = [];
+    elements = [],
+    ucData;
 
 function setup() {
   createCanvas(window.innerWidth, window.innerHeight);
@@ -18,18 +19,13 @@ function setup() {
   strokeWeight(1);
 
   center = createVector(width/2, height/2);
-  // numberOfElements = getRandomInt(4, 30);
-  numberOfElements = 4;
-/*
+  numberOfElements = getRandomInt(4, 30);
+
   a = getRandomInt(0.5, 2);
   b = getRandomInt(0.5, 2);
   c = getRandomInt(0.5, 2);
-  rotate = getRandomInt(0, 0.01);
-*/
 
-  a = 1;
-  b = 1;
-  c = 1;
+  rot = getRandomInt(0, 0.01);
 
   var alpha = (Math.PI * 2) / numberOfElements;
 
@@ -37,13 +33,30 @@ function setup() {
     elements.push(new Element(i, diameter * cos(i * alpha), diameter * sin(i * alpha)));
   }
 
+  var socket_ = new WebSocket('ws://duel.uncontext.com:80');
+  socket_.onmessage = function(data){
+    // console.log(data);
+    if (data) {
+      ucData = data;
+    }
+  };
 
 }
 
 function draw() {
+  var fcOffset = 30;
+
   background(128, 0, 90);
 
-  fc = frameCount / (30 + mouseX / 5);
+  if (frameCount % 50 === 0) {
+    if (ucData && ucData.a) {
+      fcOffset = ucData.a[getRandomInt(0, ucData.a.length)];
+    } else {
+      fcOffset = getRandomInt(0, 500);
+    }
+  }
+
+  fc = frameCount / (30 + fcOffset / 5);
 
   for (var i = 0; i < numberOfElements; i++) {
     fill(lerp(0, 360, (i + 1) / numberOfElements), 80, 80, 10);
@@ -55,8 +68,8 @@ function draw() {
 // Constructor
 function Element(index, x, y){
   this.index = index;
-  this.x = x;
-  this.y = y;
+  this.x     = x;
+  this.y     = y;
 }
 
 Element.prototype.display = function() {
@@ -66,11 +79,13 @@ Element.prototype.display = function() {
 
   dx = Math.abs(4 * diameter * sin(fc) * sin(fc*a));
   dy = Math.abs(4 * diameter * sin(fc*b) * sin(fc*c));
-  translate(center.x,center.y);
-  //rotate(rot*frameCount);
+
+  translate(center.x, center.y);
+
+  rotate(rot * frameCount);
+
   ellipse(this.x, this.y, dx, dy);
   ellipse(this.x, this.y, dy, dx);
-  //ellipse(x,y,abs(4*dia*sin(fc*a)*sin(fc*c)),abs(4*dia*sin(fc)*sin(fc*b)));
 
   pop();
 };
