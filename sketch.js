@@ -19,13 +19,14 @@ function setup() {
   strokeWeight(1);
 
   center = createVector(width/2, height/2);
-  numberOfElements = getRandomInt(4, 30);
+  numberOfElements = getRandomInt(8, 20);
 
-  a = getRandomInt(0.5, 2);
-  b = getRandomInt(0.5, 2);
-  c = getRandomInt(0.5, 2);
+  a = Math.random();
+  b = Math.random();
+  c = Math.random();
 
-  rot = getRandomInt(0, 0.01);
+  //rot = getRandomInt(0, 5);
+  rot = Math.random();
 
   var alpha = (Math.PI * 2) / numberOfElements;
 
@@ -35,9 +36,8 @@ function setup() {
 
   var socket_ = new WebSocket('ws://duel.uncontext.com:80');
   socket_.onmessage = function(data){
-    // console.log(data);
     if (data) {
-      ucData = data;
+      ucData = JSON.parse(data.data);
     }
   };
 
@@ -48,11 +48,10 @@ function draw() {
 
   background(128, 0, 90);
 
-  if (frameCount % 50 === 0) {
-    if (ucData && ucData.a) {
-      fcOffset = ucData.a[getRandomInt(0, ucData.a.length)];
-    } else {
-      fcOffset = getRandomInt(0, 500);
+  if (frameCount % 150 === 0) {
+    if (ucData) {
+      rot = ucData.d * ucData.e;
+      fcOffset = getRandomInt(5, 30);
     }
   }
 
