@@ -50,7 +50,8 @@ function draw() {
 
   if (frameCount % 150 === 0) {
     if (ucData) {
-      rot = ucData.d * ucData.e;
+      //rot = ucData.d * ucData.e;
+      rot = 0;
       fcOffset = getRandomInt(5, 30);
     }
   }
